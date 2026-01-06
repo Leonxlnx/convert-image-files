@@ -4,6 +4,7 @@ import { Button, Checkbox } from './components/ui';
 import { convertImage, formatBytes, generateZip } from './utils/imageProcessing';
 import { ConversionResult, ImageFormat, ProcessedFile } from './types';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ClickerGame } from './components/ClickerGame';
 
 const ALL_FORMATS: ImageFormat[] = ['jpeg', 'png', 'webp', 'avif', 'jfif'];
 
@@ -13,24 +14,10 @@ export default function App() {
   const [progress, setProgress] = useState({ current: 0, total: 0 });
   const [dragActive, setDragActive] = useState(false);
   const [selectedUrls, setSelectedUrls] = useState<Set<string>>(new Set());
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   
   const uploadInputRef = useRef<HTMLInputElement>(null);
 
-  // Auto-select new files
-  useEffect(() => {
-    const newUrls = new Set(selectedUrls);
-    let changed = false;
-    files.forEach(file => {
-      file.results.forEach(res => {
-        if (!selectedUrls.has(res.url)) {
-          newUrls.add(res.url);
-          changed = true;
-        }
-      });
-    });
-    if (changed) setSelectedUrls(newUrls);
-  }, [files.length]);
+  // NOTE: Auto-select removed as per request. User must choose what to download.
 
   const handleFiles = async (inputFiles: FileList | null) => {
     if (!inputFiles || inputFiles.length === 0) return;
@@ -68,7 +55,7 @@ export default function App() {
     }
 
     setFiles(prev => [...prev, ...newProcessedFiles]);
-    setTimeout(() => setIsProcessing(false), 600);
+    setTimeout(() => setIsProcessing(false), 800); 
   };
 
   const toggleSelection = (url: string) => {
@@ -132,7 +119,13 @@ export default function App() {
 
   const removeFile = (id: string) => {
     setFiles(files.filter(f => f.id !== id));
-    if (files.length === 1) setSelectedUrls(new Set());
+    // Also remove from selection
+    const fileToRemove = files.find(f => f.id === id);
+    if (fileToRemove) {
+        const newSet = new Set(selectedUrls);
+        fileToRemove.results.forEach(r => newSet.delete(r.url));
+        setSelectedUrls(newSet);
+    }
   };
 
   const handleDrag = (e: React.DragEvent) => {
@@ -150,44 +143,58 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] text-zinc-900 font-sans selection:bg-black selection:text-white relative overflow-x-hidden">
+    <div className="min-h-screen bg-[#FAFAFA] text-zinc-900 font-sans selection:bg-black selection:text-white relative overflow-x-hidden flex flex-col">
       
+      {/* GLOBAL INPUT */}
+      <input 
+        ref={uploadInputRef} 
+        type="file" 
+        multiple 
+        accept="image/*" 
+        className="hidden" 
+        onChange={(e) => handleFiles(e.target.files)}
+      />
+
       {/* Background Pattern */}
       <div className="fixed inset-0 z-0 opacity-[0.03] pointer-events-none" 
            style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, black 1px, transparent 0)', backgroundSize: '40px 40px' }} />
 
-      {/* Loading Curtain */}
+      {/* Loading Curtain - High Z-Index & Centered */}
       <AnimatePresence>
         {isProcessing && (
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-white/80 backdrop-blur-xl flex flex-col items-center justify-center p-8"
+            className="fixed inset-0 z-[9999] bg-white flex flex-col items-center justify-center p-4"
           >
              <motion.div 
                initial={{ scale: 0.9, opacity: 0 }}
                animate={{ scale: 1, opacity: 1 }}
-               className="w-full max-w-xs text-center space-y-8"
+               className="w-full flex flex-col items-center max-w-md relative"
              >
-                <div className="relative w-32 h-32 mx-auto">
-                   <svg className="w-full h-full transform -rotate-90">
-                      <circle cx="64" cy="64" r="60" stroke="#f4f4f5" strokeWidth="8" fill="none" />
+                {/* Improved Loader */}
+                <div className="relative w-28 h-28 mb-8 flex items-center justify-center">
+                   <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
+                      <circle cx="60" cy="60" r="54" stroke="#f4f4f5" strokeWidth="8" fill="none" />
                       <motion.circle 
-                        cx="64" cy="64" r="60" stroke="black" strokeWidth="8" fill="none" 
-                        strokeDasharray="377"
-                        strokeDashoffset={377 - (377 * (progress.current / progress.total))}
+                        cx="60" cy="60" r="54" stroke="black" strokeWidth="8" fill="none" 
                         strokeLinecap="round"
-                        transition={{ duration: 0.5, ease: "easeInOut" }}
+                        initial={{ pathLength: 0 }}
+                        animate={{ pathLength: progress.current / progress.total }}
+                        transition={{ duration: 0.4, ease: "easeOut" }}
                       />
                    </svg>
                    <div className="absolute inset-0 flex items-center justify-center flex-col">
-                      <span className="text-3xl font-bold tracking-tighter">{Math.round((progress.current / progress.total) * 100)}%</span>
+                      <span className="text-3xl font-black tracking-tight">{Math.round((progress.current / progress.total) * 100)}%</span>
                    </div>
                 </div>
-                <div>
-                  <h3 className="text-xl font-medium text-zinc-900">Optimizing Images</h3>
-                  <p className="text-zinc-400 mt-2 text-sm">Converting {progress.current}/{progress.total} files...</p>
+                
+                <h3 className="text-2xl font-bold text-zinc-900 mb-2 tracking-tight">Optimizing...</h3>
+                <p className="text-zinc-400 text-sm mb-10 font-medium">{progress.current} of {progress.total} files converted</p>
+                
+                <div className="animate-in fade-in zoom-in duration-500 delay-100">
+                    <ClickerGame />
                 </div>
              </motion.div>
           </motion.div>
@@ -204,12 +211,12 @@ export default function App() {
         </div>
       </nav>
 
-      <main className="relative z-10 max-w-3xl mx-auto px-6 pt-32 pb-40">
+      <main className="relative z-10 w-full max-w-3xl mx-auto px-6 pt-32 flex-grow">
         
         {/* Main Content Area */}
         <div className="space-y-6">
           
-          {/* Controls: Only visible when files exist */}
+          {/* Controls */}
           <AnimatePresence>
             {files.length > 0 && (
               <motion.div 
@@ -222,7 +229,7 @@ export default function App() {
                    <div className="flex items-center gap-1.5 p-1 bg-zinc-100/80 rounded-full">
                       <button 
                          onClick={toggleAll}
-                         className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${files.every(f => f.results.every(r => selectedUrls.has(r.url))) ? 'bg-white shadow-sm text-black' : 'text-zinc-500 hover:text-zinc-900'}`}
+                         className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${files.every(f => f.results.every(r => selectedUrls.has(r.url))) && selectedUrls.size > 0 ? 'bg-white shadow-sm text-black' : 'text-zinc-500 hover:text-zinc-900'}`}
                       >
                         All
                       </button>
@@ -239,7 +246,7 @@ export default function App() {
                 </div>
                 
                 <div className="flex items-center gap-2 w-full md:w-auto justify-end">
-                   <Button variant="ghost" onClick={() => setFiles([])} className="h-9 px-3 text-xs">Clear</Button>
+                   <Button variant="ghost" onClick={() => { setFiles([]); setSelectedUrls(new Set()); }} className="h-9 px-3 text-xs">Clear</Button>
                    <Button variant="outline" onClick={() => uploadInputRef.current?.click()} className="h-9 px-3 text-xs rounded-full">
                       <Plus size={14} /> Add
                    </Button>
@@ -282,14 +289,6 @@ export default function App() {
                     </div>
                  </div>
               </div>
-              <input 
-                ref={uploadInputRef} 
-                type="file" 
-                multiple 
-                accept="image/*" 
-                className="hidden" 
-                onChange={(e) => handleFiles(e.target.files)}
-              />
             </motion.div>
           )}
 
@@ -372,6 +371,27 @@ export default function App() {
         </div>
       </main>
 
+      {/* Footer */}
+      <footer className="relative z-10 py-12 text-center w-full">
+        <p className="text-[10px] md:text-xs text-zinc-400 font-medium tracking-widest uppercase">
+          <span className="opacity-70">Built by </span>
+          <a 
+            href="https://x.com/LexnL89916" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-zinc-900 hover:text-black font-bold border-b border-zinc-300 hover:border-black transition-colors pb-0.5"
+          >
+            Leon
+          </a>
+          <span className="mx-2 md:mx-3 opacity-30">•</span>
+          <span className="opacity-70">Local</span>
+          <span className="mx-2 md:mx-3 opacity-30">•</span>
+          <span className="opacity-70">Free</span>
+          <span className="mx-2 md:mx-3 opacity-30">•</span>
+          <span className="opacity-70">No Limits</span>
+        </p>
+      </footer>
+
       {/* Floating Action Bar */}
       <AnimatePresence>
         {selectedUrls.size > 0 && (
@@ -390,7 +410,7 @@ export default function App() {
                 onClick={downloadZip}
                 className="rounded-full px-6 h-10 text-sm shadow-none"
               >
-                Download <ArrowRight size={14} className="ml-1" />
+                {selectedUrls.size > 1 ? 'Download ZIP' : 'Download'} <ArrowRight size={14} className="ml-1" />
               </Button>
             </div>
           </motion.div>
