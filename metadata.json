@@ -1,0 +1,6 @@
+{
+  "name": "Free Image Converter",
+  "description": "Convert JPG, PNG, WEBP, AVIF, and JFIF images locally in your browser. Fast, private, and free. No file limits.",
+  "keywords": "image converter, jpg to png, webp converter, avif converter, bulk image converter, free online converter",
+  "requestFramePermissions": []
+}
