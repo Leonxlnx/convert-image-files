@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Upload, Download, X, FileImage, Check, Loader2, Archive, Plus, ArrowRight, Settings2 } from 'lucide-react';
+import { Upload, Download, X, FileImage, Check, Loader2, Archive, Plus, ArrowRight, Settings2, Sparkles } from 'lucide-react';
 import { Button, Checkbox } from './components/ui';
 import { convertImage, formatBytes, generateZip } from './utils/imageProcessing';
 import { ConversionResult, ImageFormat, ProcessedFile } from './types';
@@ -147,8 +147,9 @@ export default function App() {
     if (e.dataTransfer.files) handleFiles(e.dataTransfer.files);
   };
 
+  // Ensure 100dvh for mobile browsers to avoid scrolling issues on empty state
   return (
-    <div className={`min-h-screen bg-[#fafafa] text-zinc-800 font-sans selection:bg-zinc-900 selection:text-white relative flex flex-col ${!hasFiles ? 'h-screen overflow-hidden' : 'overflow-x-hidden'}`}>
+    <div className={`min-h-[100dvh] bg-[#fafafa] text-zinc-800 font-sans selection:bg-zinc-900 selection:text-white relative flex flex-col transition-colors duration-700`}>
       
       {/* GLOBAL INPUT */}
       <input 
@@ -160,9 +161,9 @@ export default function App() {
         onChange={(e) => handleFiles(e.target.files)}
       />
 
-      {/* Background Pattern - Softened */}
-      <div className="fixed inset-0 z-0 opacity-[0.02] pointer-events-none" 
-           style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, black 1px, transparent 0)', backgroundSize: '48px 48px' }} />
+      {/* Background Pattern - Softer & Subtle */}
+      <div className="fixed inset-0 z-0 opacity-[0.015] pointer-events-none" 
+           style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, black 1px, transparent 0)', backgroundSize: '40px 40px' }} />
 
       {/* Loading Curtain */}
       <AnimatePresence>
@@ -194,7 +195,7 @@ export default function App() {
                    </div>
                 </div>
                 
-                <h3 className="text-xl font-semibold text-zinc-900 mb-2 tracking-tight">Optimizing your images</h3>
+                <h3 className="text-xl font-semibold text-zinc-900 mb-2 tracking-tight">Optimizing with cxnvert</h3>
                 <p className="text-zinc-400 text-sm mb-12 font-medium">{progress.current} of {progress.total} complete</p>
                 
                 <div className="animate-in fade-in zoom-in duration-700 delay-100">
@@ -207,16 +208,16 @@ export default function App() {
 
       {/* Navbar - Position changes based on state to ensure layout balance */}
       <nav className={`fixed top-0 left-0 right-0 z-40 flex items-center justify-center pointer-events-none transition-all duration-700 ease-in-out ${!hasFiles ? 'h-32' : 'h-24'}`}>
-        <div className="bg-white/80 backdrop-blur-xl border border-white/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] px-8 py-3.5 rounded-full flex items-center gap-3 pointer-events-auto mt-6">
-          <div className="bg-zinc-900 text-white w-8 h-8 rounded-full flex items-center justify-center shadow-md shadow-zinc-900/10">
-            <FileImage size={14} strokeWidth={2.5} />
+        <div className="bg-white/80 backdrop-blur-xl border border-white/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] px-6 py-3 rounded-full flex items-center gap-2.5 pointer-events-auto mt-6">
+          <div className="bg-zinc-900 text-white w-7 h-7 rounded-full flex items-center justify-center shadow-md shadow-zinc-900/10">
+            <Sparkles size={12} strokeWidth={2.5} />
           </div>
-          <span className="font-bold text-sm tracking-tight text-zinc-800">Converter</span>
+          <span className="font-bold text-sm tracking-tight text-zinc-800">cxnvert</span>
         </div>
       </nav>
 
-      {/* Main Content Area - Center content vertically if no files */}
-      <main className={`relative z-10 w-full max-w-3xl mx-auto px-6 flex-grow flex flex-col ${!hasFiles ? 'justify-center items-center' : 'pt-36 pb-32'}`}>
+      {/* Main Content Area - FLEX GROW to push footer down, flex center for vertical centering */}
+      <main className={`relative z-10 w-full max-w-3xl mx-auto px-6 flex-grow flex flex-col transition-all duration-500 ${!hasFiles ? 'justify-center items-center' : 'pt-36 pb-32'}`}>
         
         <div className="space-y-8 w-full">
           
@@ -259,19 +260,19 @@ export default function App() {
             )}
           </AnimatePresence>
 
-          {/* Empty State / Dropzone */}
+          {/* Empty State / Dropzone - Centered */}
           {!hasFiles && (
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="text-center w-full"
+              className="text-center w-full flex flex-col items-center justify-center"
             >
               <div 
                 className={`
-                  group relative overflow-hidden bg-white rounded-[3rem] transition-all duration-500 cursor-pointer mx-auto w-full max-w-2xl
+                  group relative overflow-hidden bg-white rounded-[3rem] transition-all duration-500 cursor-pointer w-full max-w-xl mx-auto
                   ${dragActive ? 'ring-8 ring-zinc-100 scale-[1.01]' : 'shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] hover:shadow-[0_25px_70px_-15px_rgba(0,0,0,0.08)] hover:scale-[1.005]'}
                 `}
-                style={{ height: '420px' }}
+                style={{ height: 'min(420px, 60vh)' }}
                 onClick={() => uploadInputRef.current?.click()}
                 onDragEnter={handleDrag}
                 onDragLeave={handleDrag}
@@ -281,10 +282,10 @@ export default function App() {
                  <div className="absolute inset-0 bg-[radial-gradient(#e4e4e7_1px,transparent_1px)] [background-size:24px_24px] opacity-40" />
                  
                  <div className="absolute inset-0 flex flex-col items-center justify-center p-8 z-10">
-                    <div className="w-24 h-24 bg-zinc-50 rounded-[2rem] flex items-center justify-center mb-10 shadow-sm group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 ease-out">
-                       <Upload className="text-zinc-800 w-10 h-10" strokeWidth={1.5} />
+                    <div className="w-20 h-20 bg-zinc-50 rounded-[2rem] flex items-center justify-center mb-8 shadow-sm group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 ease-out">
+                       <Upload className="text-zinc-800 w-8 h-8" strokeWidth={1.5} />
                     </div>
-                    <h2 className="text-4xl font-bold tracking-tight text-zinc-900 mb-4">Drop files here</h2>
+                    <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-zinc-900 mb-4">Drop files here</h2>
                     <p className="text-zinc-400 font-medium max-w-xs mx-auto leading-relaxed">
                        Convert JPG, PNG, WEBP, AVIF, and JFIF instantly.
                     </p>
@@ -375,8 +376,8 @@ export default function App() {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className={`z-10 py-10 text-center w-full transition-all duration-500 ${!hasFiles ? 'absolute bottom-0' : 'relative'}`}>
+      {/* Footer - Positioned absolutely only if screen is large enough, otherwise relative to flow */}
+      <footer className={`z-10 py-6 text-center w-full transition-all duration-500 ${!hasFiles ? 'absolute bottom-0' : 'relative mt-auto'}`}>
         <div className="flex items-center justify-center gap-2 md:gap-3 text-[10px] md:text-xs text-zinc-400 font-semibold tracking-widest uppercase">
           <span className="opacity-60">Built by</span>
           <a 
@@ -392,8 +393,6 @@ export default function App() {
           <span className="opacity-60">Local</span>
           <span className="opacity-20">•</span>
           <span className="opacity-60">Free</span>
-          <span className="opacity-20">•</span>
-          <span className="opacity-60">No Limits</span>
         </div>
       </footer>
 

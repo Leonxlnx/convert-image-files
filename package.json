@@ -1,5 +1,5 @@
 {
-  "name": "free-image-converter",
+  "name": "cxnvert",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -13,7 +13,9 @@
     "lucide-react": "^0.562.0",
     "framer-motion": "^12.24.7",
     "react": "^19.2.3",
-    "jszip": "^3.10.1"
+    "jszip": "^3.10.1",
+    "@vitejs/plugin-react": "4.2.1",
+    "vite": "^7.3.0"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",

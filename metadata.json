@@ -1,6 +1,6 @@
 {
-  "name": "Free Image Converter",
-  "description": "Convert JPG, PNG, WEBP, AVIF, and JFIF images locally in your browser. Fast, private, and free. No file limits.",
-  "keywords": "image converter, jpg to png, webp converter, avif converter, bulk image converter, free online converter",
+  "name": "cxnvert",
+  "description": "cxnvert is a privacy-focused, local image converter. Transform JPG, PNG, WEBP, AVIF, and JFIF instantly in your browser. No uploads, no limits.",
+  "keywords": "cxnvert, image converter, jpg to png, webp converter, local conversion, privacy tools, free online converter",
   "requestFramePermissions": []
 }
