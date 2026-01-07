@@ -404,18 +404,18 @@ export default function App() {
             initial={{ y: 100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 100, opacity: 0 }}
-            className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 w-full max-w-sm px-6"
+            className="fixed bottom-6 sm:bottom-10 left-0 right-0 z-50 flex justify-center px-4 sm:px-6 pb-[env(safe-area-inset-bottom)]"
           >
-            <div className="bg-white/90 backdrop-blur-xl border border-white/50 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] p-2.5 pl-6 rounded-full flex items-center justify-between ring-1 ring-black/5">
-              <div className="flex flex-col">
-                <span className="text-xs font-bold text-zinc-800 uppercase tracking-wide">Ready</span>
-                <span className="text-[10px] text-zinc-400 font-medium">{selectedUrls.size} files selected</span>
+            <div className="bg-white/90 backdrop-blur-xl border border-white/50 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] p-2 sm:p-2.5 pl-4 sm:pl-6 rounded-full flex items-center justify-between gap-3 ring-1 ring-black/5 w-full max-w-sm">
+              <div className="flex flex-col min-w-0">
+                <span className="text-[10px] sm:text-xs font-bold text-zinc-800 uppercase tracking-wide">Ready</span>
+                <span className="text-[9px] sm:text-[10px] text-zinc-400 font-medium">{selectedUrls.size} files selected</span>
               </div>
               <Button
                 onClick={downloadZip}
-                className="rounded-full px-8 h-11 text-sm shadow-lg shadow-zinc-900/20 hover:shadow-zinc-900/30 hover:scale-105"
+                className="rounded-full px-4 sm:px-8 h-10 sm:h-11 text-xs sm:text-sm shadow-lg shadow-zinc-900/20 hover:shadow-zinc-900/30 hover:scale-105 shrink-0"
               >
-                {selectedUrls.size > 1 ? 'Download ZIP' : 'Download'} <ArrowRight size={14} className="ml-1" strokeWidth={3} />
+                {selectedUrls.size > 1 ? 'ZIP' : 'Download'} <ArrowRight size={14} className="ml-1" strokeWidth={3} />
               </Button>
             </div>
           </motion.div>
