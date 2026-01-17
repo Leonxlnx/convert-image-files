@@ -382,7 +382,7 @@ export default function App() {
         <div className="flex items-center justify-center gap-2 md:gap-3 text-[10px] md:text-xs text-zinc-400 font-semibold tracking-widest uppercase">
           <span className="opacity-60">Built by</span>
           <a
-            href="https://x.com/LexnL89916"
+            href="https://x.com/LexnLin"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 text-zinc-800 hover:text-black font-bold transition-colors group"
